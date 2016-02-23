@@ -1,7 +1,7 @@
 Push Encryption (node)
 ----------------------
 
-This library provides the functions neccessary to encrypt a payload for sending
+This library provides the functions necessary to encrypt a payload for sending
 with the Web Push protocol. It also includes a helper function for actually
 send the message to the Web Push endpoint.
 

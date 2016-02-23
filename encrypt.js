@@ -18,7 +18,7 @@
 
 const crypto = require('crypto');
 
-const PADDING_BUFFER = new Buffer(1).fill(0);
+const PADDING_BUFFER = new Buffer(2).fill(0);
 const ONE_BUFFER = new Buffer(1).fill(1);
 const AUTH_INFO = new Buffer('Content-Encoding: auth\0', 'utf8');
 const MAX_PAYLOAD_LENGTH = 4080;
@@ -68,7 +68,7 @@ function encrypt(message, subscription) {
   const context = createContext(clientPublicKey, serverPublicKey);
 
   // Derive the Content Encryption Key
-  const contentEncryptionKeyInfo = createInfo('aesgcm128', context);
+  const contentEncryptionKeyInfo = createInfo('aesgcm', context);
   const contentEncryptionKey = hkdf(salt, prk, contentEncryptionKeyInfo, 16);
 
   // Derive the Nonce
@@ -120,7 +120,6 @@ function createContext(clientPublicKey, serverPublicKey) {
   serverPublicKey.copy(context, 70);
   return context;
 };
-
 
 /**
  * Returns an info record. See sections 3.2 and 3.3 of
