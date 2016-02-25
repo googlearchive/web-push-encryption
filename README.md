@@ -1,7 +1,7 @@
 Push Encryption (node)
 ----------------------
 
-![Dependency Badge from David](https://david-dm.org/GoogleChrome/push-encryption-node.svg)
+[![Dependency Badge from David](https://david-dm.org/GoogleChrome/push-encryption-node.svg)](https://david-dm.org/GoogleChrome/push-encryption-node)
 
 This library provides the functions necessary to encrypt a payload for sending
 with the Web Push protocol. It also includes a helper function for actually
