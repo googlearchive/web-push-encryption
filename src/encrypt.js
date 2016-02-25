@@ -136,15 +136,18 @@ function createInfo(type, context) {
   const l = type.length;
   const info = new Buffer(18 + l + 1 + 5 + 135);
 
-  // 18 bytes (18 total)
+  // The start index for each element within the buffer is:
+  // value               | length | start  |
+  // ---------------------------------------
+  // 'Content-Encoding: '|   18   | 0      |
+  // type                |   l    | 18     |
+  // nul byte            |   1    | 18 + l |
+  // 'P-256'             |   5    | 19 + l |
+  // info                |   135  | 24 + l |
   info.write('Content-Encoding: ');
-  // l bytes (18 + l total)
   info.write(type, 18);
-  // 1 byte (19 + l total)
   info.write('\0', 18 + l);
-  // 5 bytes (24 + l total)
   info.write('P-256', 19 + l);
-  // 135 bytes (159 + l total)
   context.copy(info, 24 + l);
 
   return info;
