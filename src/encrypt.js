@@ -166,7 +166,7 @@ function createInfo(type, context) {
  * @param  {Buffer} ikm    Input keying material
  * @param  {Buffer} info   Application-specfic context
  * @param  {Number} length The length (in bytes) of the required output key
- * @return {Buffer} hkdf
+ * @return {Buffer} Key
  */
 function hkdf(salt, ikm, info, length) {
   // Extract
