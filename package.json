@@ -2,14 +2,15 @@
   "name": "web-push-encryption",
   "version": "1.0.0",
   "description": "A library that handles payload encryption for the Web Push protocol",
-  "main": "index.js",
+  "main": "src/index.js",
   "dependencies": {
     "request": "^2.67.0"
   },
   "devDependencies": {
     "eslint-config-google": "^0.3.0",
     "gulp": "^3.9.0",
-    "gulp-eslint": "^1.1.1"
+    "gulp-eslint": "^1.1.1",
+    "require-dir": "^0.3.0"
   },
   "scripts": {
     "test": "gulp lint"
