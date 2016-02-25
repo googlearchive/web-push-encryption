@@ -1,6 +1,8 @@
 Push Encryption (node)
 ----------------------
 
+[![Travis Build Status](https://travis-ci.org/GoogleChrome/push-encryption-node.svg?branch=master)](https://travis-ci.org/GoogleChrome/push-encryption-node)
+
 This library provides the functions necessary to encrypt a payload for sending
 with the Web Push protocol. It also includes a helper function for actually
 send the message to the Web Push endpoint.
