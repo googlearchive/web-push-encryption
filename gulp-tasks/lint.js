@@ -16,13 +16,12 @@
 
 'use strict';
 
-GLOBAL.config = {
-  src: './src'
-};
-
 const gulp = require('gulp');
+const eslint = require('gulp-eslint');
 
-// Import tasks from the gulp-tasks directory
-require('require-dir')('./gulp-tasks');
-
-gulp.task('default', ['lint']);
+gulp.task('lint', function() {
+  return gulp.src(GLOBAL.config.src + '/**/*.js')
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError());
+});

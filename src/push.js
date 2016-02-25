@@ -25,23 +25,23 @@ const TEMP_GCM_URL = 'https://gcm-http.googleapis.com/gcm';
 /**
  * URL safe Base64 encoder
  * @param  {Buffer} buffer The data to encode
- * @return {String}
+ * @return {String} URL safe base 64 encoded string
  */
 function ub64(buffer) {
   return buffer.toString('base64').replace(/\+/g, '-')
     .replace(/\//g, '_')
-    .replace(/=/g, '');
-};
+    .replace(/\=/g, '');
+}
 
 /**
  * A helper for creating the value part of the HTTP encryption headers
  * @param  {String} name  The name of the header field
  * @param  {Buffer} value The value of the field
- * @return {String}
+ * @return {String} String representation of the header
  */
 function createHeaderField(name, value) {
   return `${name}=${ub64(value)}`;
-};
+}
 
 const authTokens = [];
 
@@ -57,7 +57,7 @@ function getAuthToken(endpoint) {
       return authTokens[i].token;
     }
   }
-};
+}
 
 /**
  * Adds a new authentication token. The pattern is a simple string. An endpoint
@@ -68,14 +68,15 @@ function getAuthToken(endpoint) {
  */
 function addAuthToken(pattern, token) {
   authTokens.push({pattern, token});
-};
+}
 
 /**
  * Sends a message using the Web Push protocol
  * @param  {String}   message      The message to send
  * @param  {Object}   subscription The subscription details for the client we
  *                                 are sending to
- * @return {Promise}
+ * @return {Promise} A promise that resolves if the push was sent successfully
+ *                   with status and body.
  */
 function sendWebPush(message, subscription) {
   let endpoint = subscription.endpoint;
@@ -93,7 +94,7 @@ function sendWebPush(message, subscription) {
   };
 
   if (authToken) {
-    headers['Authorization'] = 'key=' + authToken;
+    headers.Authorization = 'key=' + authToken;
   }
 
   return new Promise(function(resolve, reject) {
@@ -111,6 +112,12 @@ function sendWebPush(message, subscription) {
       }
     });
   });
-};
+}
 
-module.exports = {sendWebPush, addAuthToken, ub64, createHeaderField, getAuthToken};
+module.exports = {
+  sendWebPush,
+  addAuthToken,
+  ub64,
+  createHeaderField,
+  getAuthToken
+};

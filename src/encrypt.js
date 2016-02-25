@@ -84,7 +84,7 @@ function encrypt(message, subscription) {
     salt: salt,
     serverPublicKey: serverPublicKey
   };
-};
+}
 
 /**
  * Creates a context for deriving encyption parameters.
@@ -92,7 +92,7 @@ function encrypt(message, subscription) {
  * {@link https://tools.ietf.org/html/draft-ietf-httpbis-encryption-encoding-00}
  * @param  {Buffer} clientPublicKey The client's public key
  * @param  {Buffer} serverPublicKey Our public key
- * @return {Buffer}
+ * @return {Buffer} context
  */
 function createContext(clientPublicKey, serverPublicKey) {
   // The context format is:
@@ -119,14 +119,14 @@ function createContext(clientPublicKey, serverPublicKey) {
   context.writeUInt16BE(serverPublicKey.length, 68);
   serverPublicKey.copy(context, 70);
   return context;
-};
+}
 
 /**
  * Returns an info record. See sections 3.2 and 3.3 of
  * {@link https://tools.ietf.org/html/draft-ietf-httpbis-encryption-encoding-00}
  * @param  {String} type    The type of the info record
  * @param  {Buffer} context The context for the record
- * @return {Buffer}
+ * @return {Buffer} info
  */
 function createInfo(type, context) {
   if (context.length !== 135) {
@@ -136,14 +136,19 @@ function createInfo(type, context) {
   const l = type.length;
   const info = new Buffer(18 + l + 1 + 5 + 135);
 
-  info.write('Content-Encoding: ');   // 18 bytes (18 total)
-  info.write(type, 18);               // l bytes (18 + l total)
-  info.write('\0', 18 + l);           // 1 byte (19 + l total)
-  info.write('P-256', 19 + l);        // 5 bytes (24 + l total)
-  context.copy(info, 24 + l);         // 135 bytes (159 + l total)
+  // 18 bytes (18 total)
+  info.write('Content-Encoding: ');
+  // l bytes (18 + l total)
+  info.write(type, 18);
+  // 1 byte (19 + l total)
+  info.write('\0', 18 + l);
+  // 5 bytes (24 + l total)
+  info.write('P-256', 19 + l);
+  // 135 bytes (159 + l total)
+  context.copy(info, 24 + l);
 
   return info;
-};
+}
 
 /**
  * HMAC-based Extract-and-Expand Key Derivation Function (HKDF)
@@ -161,7 +166,7 @@ function createInfo(type, context) {
  * @param  {Buffer} ikm    Input keying material
  * @param  {Buffer} info   Application-specfic context
  * @param  {Number} length The length (in bytes) of the required output key
- * @return {Buffer}
+ * @return {Buffer} hkdf
  */
 function hkdf(salt, ikm, info, length) {
   // Extract
@@ -174,7 +179,7 @@ function hkdf(salt, ikm, info, length) {
   infoHmac.update(info);
   infoHmac.update(ONE_BUFFER);
   return infoHmac.digest().slice(0, length);
-};
+}
 
 /**
  * Encrypt the plaintext message using AES128/GCM
@@ -194,7 +199,7 @@ function encryptPayload(plaintext, contentEncryptionKey, nonce) {
   cipher.final();
 
   return Buffer.concat([paddingResult, textResult, cipher.getAuthTag()]);
-};
+}
 
 // All functions are exported here to make them testable, but only `encrypt` is
 // re-exported by `index.js` as part of the public API.

@@ -9,7 +9,8 @@
   "devDependencies": {
     "eslint-config-google": "^0.3.0",
     "gulp": "^3.9.0",
-    "gulp-eslint": "^1.1.1"
+    "gulp-eslint": "^1.1.1",
+    "require-dir": "^0.3.0"
   },
   "scripts": {
     "test": "gulp lint"
