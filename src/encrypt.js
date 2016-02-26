@@ -41,7 +41,8 @@ function encrypt(message, subscription) {
   // Create Buffers for all of the inputs
   const plaintext = new Buffer(message, 'utf8');
   if (plaintext.length > MAX_PAYLOAD_LENGTH) {
-    throw new Error(`Payload is too large. The max number of bytes is ${MAX_PAYLOAD_LENGTH}, input is ${plaintext.length} bytes.`);
+    throw new Error(`Payload is too large. The max number of ` +
+      `bytes is ${MAX_PAYLOAD_LENGTH}, input is ${plaintext.length} bytes.`);
   }
 
   if (!subscription || !subscription.keys) {
