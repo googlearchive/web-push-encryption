@@ -6,3 +6,4 @@ node_js:
 
 install:
   - npm install -g mocha
+  - npm install
