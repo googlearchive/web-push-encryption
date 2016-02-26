@@ -50,7 +50,7 @@ function encrypt(message, subscription) {
 
   if (!subscription.keys.p256dh ||
       !subscription.keys.auth) {
-    throw new Error('Subscription is missing encryption details.');
+    throw new Error('Subscription is missing some encryption details.');
   }
 
   const clientPublicKey = new Buffer(subscription.keys.p256dh, 'base64');

@@ -112,7 +112,7 @@ describe('Test the Libraries Top Level API', function() {
 
       expect(
         () => library.encrypt('Hello, World', subscription)
-      ).to.throw('Subscription is missing encryption details');
+      ).to.throw('Subscription is missing some encryption details');
     });
 
     it('should throw an error due to an invalid client public key', function() {
@@ -133,7 +133,7 @@ describe('Test the Libraries Top Level API', function() {
 
       expect(
         () => library.encrypt('Hello, World', subscription)
-      ).to.throw('Subscription is missing encryption details');
+      ).to.throw('Subscription is missing some encryption details');
     });
 
     it('should not throw an error when no p256dh key is passed in', function() {
@@ -147,7 +147,7 @@ describe('Test the Libraries Top Level API', function() {
 
       expect(
         () => library.encrypt('Hello, World', subscription)
-      ).to.throw('Subscription is missing encryption details');
+      ).to.throw('Subscription is missing some encryption details');
     });
 
     it('should return the correct encryption values', function() {
