@@ -189,19 +189,15 @@ describe('Test the Libraries Top Level API', function() {
     it('should throw an error when the input is too large', function() {
       const library = require('../src/index.js');
 
-      let largeInput = '';
-      for (let i = 0; i < 4081; i++) {
-        largeInput += 'A';
-      }
+      let largeInput = new Buffer(4081);
+      largeInput.fill(0);
 
       expect(
         () => library.encrypt(new Buffer(largeInput).toString('utf8'), VALID_SUBSCRIPTION)
       ).to.throw('Payload is too large. The max number of bytes is 4080, input is 4081 bytes.');
 
-      largeInput = '';
-      for (let i = 0; i < 5000; i++) {
-        largeInput += 'A';
-      }
+      largeInput = new Buffer(5000);
+      largeInput.fill(0);
 
       expect(
         () => library.encrypt(new Buffer(largeInput).toString('utf8'), VALID_SUBSCRIPTION)
