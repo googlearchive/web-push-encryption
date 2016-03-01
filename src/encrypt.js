@@ -58,11 +58,11 @@ function encrypt(message, subscription) {
   const clientAuthToken = new Buffer(subscription.keys.auth, 'base64');
 
   if (clientAuthToken.length !== 16) {
-    throw new Error('Subscriptions Auth token is not 16 bytes.');
+    throw new Error('Subscription\'s Auth token is not 16 bytes.');
   }
 
   if (clientPublicKey.length !== 65) {
-    throw new Error('Subscriptions client key (p256dh) is invalid.');
+    throw new Error('Subscription\'s client key (p256dh) is invalid.');
   }
 
   // Create a random 16-byte salt

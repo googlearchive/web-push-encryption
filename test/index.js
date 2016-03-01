@@ -24,7 +24,7 @@ const sinon = require('sinon');
 const EXAMPLE_SERVER_KEYS = {
   public: 'BOg5KfYiBdDDRF12Ri17y3v+POPr8X0nVP2jDjowPVI/DMKU1aQ3OLdPH1iaakvR9/PHq6tNCzJH35v/JUz2crY=',
   private: 'uDNsfsz91y2ywQeOHljVoiUg3j5RGrDVAswRqjP3v90='
-}
+};
 
 const EXAMPLE_SALT = 'AAAAAAAAAAAAAAAAAAAAAA==';
 
@@ -37,7 +37,7 @@ const VALID_SUBSCRIPTION = {
     auth: '8eDyX_uCN0XRhSbY5hs7Hg==',
     p256dh: 'BCIWgsnyXDv1VkhqL2P7YRBvdeuDnlwAPT2guNhdIoW3IP7GmHh1SMKPLxRf7x8vJy6ZFK3ol2ohgn_-0yP7QQA='
   }
-}
+};
 
 const INVALID_AUTH_SUBSCRIPTION = {
   endpoint: 'https://example-endpoint.com/example/1234',
@@ -45,7 +45,7 @@ const INVALID_AUTH_SUBSCRIPTION = {
     auth: 'uCN0XRhSbY5hs7Hg==',
     p256dh: 'BCIWgsnyXDv1VkhqL2P7YRBvdeuDnlwAPT2guNhdIoW3IP7GmHh1SMKPLxRf7x8vJy6ZFK3ol2ohgn_-0yP7QQA='
   }
-}
+};
 
 const INVALID_P256DH_SUBSCRIPTION = {
   endpoint: 'https://example-endpoint.com/example/1234',
@@ -53,16 +53,29 @@ const INVALID_P256DH_SUBSCRIPTION = {
     auth: '8eDyX_uCN0XRhSbY5hs7Hg==',
     p256dh: '6ZFK3ol2ohgn_-0yP7QQA='
   }
-}
+};
 
 const SUBSCRIPTION_NO_KEYS = {
   endpoint: 'https://example-endpoint.com/example/1234'
-}
+};
 
 const SALT_LENGTH = 16;
 const SERVER_PUBLIC_KEY_LENGTH = 65;
 
+let testStubs = [];
+
 describe('Test the Libraries Top Level API', function() {
+  const restoreStubs = () => {
+    testStubs.forEach(stub => {
+      stub.restore();
+    });
+    testStubs = [];
+  };
+
+  beforeEach(() => restoreStubs());
+
+  after(() => restoreStubs());
+
   describe('Test encrypt() method', function() {
     it('should encrypt the message with a valid subscription', function() {
       const library = require('../src/index.js');
@@ -98,7 +111,7 @@ describe('Test the Libraries Top Level API', function() {
       const library = require('../src/index.js');
       expect(
         () => library.encrypt('Hello, World', INVALID_AUTH_SUBSCRIPTION)
-      ).to.throw('Subscriptions Auth token is not 16 bytes.');
+      ).to.throw('Subscription\'s Auth token is not 16 bytes.');
     });
 
     it('should not throw an error when no auth token is passed in', function() {
@@ -119,24 +132,10 @@ describe('Test the Libraries Top Level API', function() {
       const library = require('../src/index.js');
       expect(
         () => library.encrypt('Hello, World', INVALID_P256DH_SUBSCRIPTION)
-      ).to.throw('Subscriptions client key (p256dh) is invalid.');
+      ).to.throw('Subscription\'s client key (p256dh) is invalid.');
     });
 
-    it('should not throw an error when no p256dh key is passed in', function() {
-      const library = require('../src/index.js');
-      let subscription = {
-        endpoint: VALID_SUBSCRIPTION.endpoint,
-        keys: {
-          auth: VALID_SUBSCRIPTION.keys.auth
-        }
-      };
-
-      expect(
-        () => library.encrypt('Hello, World', subscription)
-      ).to.throw('Subscription is missing some encryption details');
-    });
-
-    it('should not throw an error when no p256dh key is passed in', function() {
+    it('should throw an error when no p256dh key is passed in', function() {
       const library = require('../src/index.js');
       let subscription = {
         endpoint: VALID_SUBSCRIPTION.endpoint,
@@ -156,6 +155,7 @@ describe('Test the Libraries Top Level API', function() {
       // This is for the salt
       let saltStub = sinon.stub(crypto, 'randomBytes');
       saltStub.withArgs(16).returns(new Buffer(EXAMPLE_SALT, 'base64'));
+      testStubs.push(saltStub);
 
       // Server key generation
       const exampleECDH = crypto.createECDH('prime256v1');
@@ -163,12 +163,15 @@ describe('Test the Libraries Top Level API', function() {
       exampleECDH.setPrivateKey(EXAMPLE_SERVER_KEYS.private, 'base64');
       exampleECDH.setPublicKey(EXAMPLE_SERVER_KEYS.public, 'base64');
       // Make this a NOOP
-      exampleECDH.generateKeys = () => {return exampleECDH.getPublicKey();};
+      exampleECDH.generateKeys = () => {
+        return exampleECDH.getPublicKey();
+      };
       let ecdhStub = sinon.stub(crypto, 'createECDH');
-      ecdhStub.withArgs('prime256v1').returns(exampleECDH)
+      ecdhStub.withArgs('prime256v1').returns(exampleECDH);
+      testStubs.push(ecdhStub);
 
       const library = proxyquire('../src/index.js', {
-        'crypto':crypto
+        'crypto': crypto
       });
 
       const response = library.encrypt(EXAMPLE_INPUT, VALID_SUBSCRIPTION);
