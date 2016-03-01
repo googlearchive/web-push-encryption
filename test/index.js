@@ -193,14 +193,14 @@ describe('Test the Libraries Top Level API', function() {
       largeInput.fill(0);
 
       expect(
-        () => library.encrypt(new Buffer(largeInput).toString('utf8'), VALID_SUBSCRIPTION)
+        () => library.encrypt(largeInput.toString('utf8'), VALID_SUBSCRIPTION)
       ).to.throw('Payload is too large. The max number of bytes is 4080, input is 4081 bytes.');
 
       largeInput = new Buffer(5000);
       largeInput.fill(0);
 
       expect(
-        () => library.encrypt(new Buffer(largeInput).toString('utf8'), VALID_SUBSCRIPTION)
+        () => library.encrypt(largeInput.toString('utf8'), VALID_SUBSCRIPTION)
       ).to.throw('Payload is too large. The max number of bytes is 4080, input is 5000 bytes.');
     });
   });
