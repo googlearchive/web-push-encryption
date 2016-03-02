@@ -41,15 +41,29 @@ function encrypt(message, subscription) {
   // Create Buffers for all of the inputs
   const plaintext = new Buffer(message, 'utf8');
   if (plaintext.length > MAX_PAYLOAD_LENGTH) {
-    throw new Error(`Payload is too large: ${plaintext.length} bytes`);
+    throw new Error(`Payload is too large. The max number of ` +
+      `bytes is ${MAX_PAYLOAD_LENGTH}, input is ${plaintext.length} bytes.`);
   }
 
-  if (!subscription || !subscription.keys || !subscription.keys.p256dh ||
-      !subscription.keys.auth) {
-    throw new Error('Subscription has no encryption details');
+  if (!subscription || !subscription.keys) {
+    throw new Error('Subscription has no encryption details.');
   }
+
+  if (!subscription.keys.p256dh ||
+      !subscription.keys.auth) {
+    throw new Error('Subscription is missing some encryption details.');
+  }
+
   const clientPublicKey = new Buffer(subscription.keys.p256dh, 'base64');
   const clientAuthToken = new Buffer(subscription.keys.auth, 'base64');
+
+  if (clientAuthToken.length !== 16) {
+    throw new Error('Subscription\'s Auth token is not 16 bytes.');
+  }
+
+  if (clientPublicKey.length !== 65) {
+    throw new Error('Subscription\'s client key (p256dh) is invalid.');
+  }
 
   // Create a random 16-byte salt
   const salt = crypto.randomBytes(16);
