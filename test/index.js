@@ -204,4 +204,63 @@ describe('Test the Libraries Top Level API', function() {
       ).to.throw('Payload is too large. The max number of bytes is 4080, input is 5000 bytes.');
     });
   });
+
+  describe('Test sendWebPush() method', function() {
+    it('should throw an error when no input provided', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush()
+      ).to.throw('sendWebPush() expects a subscription endpoint with ' +
+        'an endpoint parameter and a string send with the push message.');
+    });
+
+    it('should throw an error when the subscription object has no endpoint', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush({})
+      ).to.throw('sendWebPush() expects a subscription endpoint with ' +
+        'an endpoint parameter and a string send with the push message.');
+    });
+
+    it('should throw an error when a subscription is passed in with no payload data', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush({
+          endpoint: 'http://fakendpoint'
+        })
+      ).to.throw('sendWebPush() expects a subscription endpoint with ' +
+        'an endpoint parameter and a string send with the push message.');
+    });
+
+    it('should throw an error when a subscription is passed in with array as payload data', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush({
+          endpoint: 'http://fakendpoint'
+        }, [
+          {
+            hello: 'world'
+          },
+          'This is a test',
+          Promise.resolve('Promise Resolve'),
+          Promise.reject('Promise Reject')
+        ])
+      ).to.throw('sendWebPush() expects a subscription endpoint with ' +
+        'an endpoint parameter and a string send with the push message.');
+    });
+
+    it('should throw an error when a subscription with no encryption details is passed in with string as payload data', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush({
+          endpoint: 'http://fakendpoint'
+        }, 'Hello, World!')
+      ).to.throw('Subscription has no encryption details.');
+    });
+  });
 });
