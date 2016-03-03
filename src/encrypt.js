@@ -30,7 +30,7 @@ const MAX_PAYLOAD_LENGTH = 4078;
  * - {@link https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman}
  * - {@link https://tools.ietf.org/html/draft-ietf-webpush-encryption}
  *
- * @param  {String} message       The message to be sent
+ * @param  {String|Buffer} message The message to be sent
  * @param  {Object} subscription  The subscription details for the client
  * @param  {number} paddingLength Number of bytes of padding to use
  * @return {Object}               An Object containing the encrypted payload and
@@ -42,7 +42,15 @@ function encrypt(message, subscription, paddingLength) {
 
   // Create Buffers for all of the inputs
   const paddingBuffer = makePadding(paddingLength);
-  const messageBuffer = new Buffer(message, 'utf8');
+  let messageBuffer;
+
+  if (typeof message === 'string') {
+    messageBuffer = new Buffer(message, 'utf8');
+  } else if (message instanceof Buffer) {
+    messageBuffer = message;
+  } else {
+    throw new Error('Message must be a String or a Buffer');
+  }
 
   // The maximum size of the message + padding is 4078 bytes
   if ((messageBuffer.length + paddingLength) > MAX_PAYLOAD_LENGTH) {

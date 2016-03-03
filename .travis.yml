@@ -5,5 +5,4 @@ node_js:
   - 'stable'
 
 install:
-  - npm install -g mocha
   - npm install

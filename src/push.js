@@ -17,7 +17,7 @@
 'use strict';
 
 const request = require('request');
-const encrypt = require('./encrypt').encrypt;
+const encrypt = require('./encrypt');
 
 const GCM_URL = 'https://android.googleapis.com/gcm/send';
 const TEMP_GCM_URL = 'https://gcm-http.googleapis.com/gcm';
@@ -45,6 +45,11 @@ function ub64(buffer) {
  *                   with status and body.
  */
 function sendWebPush(message, subscription, authToken) {
+  if (!subscription || !subscription.endpoint) {
+    throw new Error('sendWebPush() expects a subscription endpoint with ' +
+      'an endpoint parameter.');
+  }
+
   // If the endpoint is GCM then we temporarily need to rewrite it, as not all
   // GCM servers support the Web Push protocol. This should go away in the
   // future.
@@ -58,6 +63,8 @@ function sendWebPush(message, subscription, authToken) {
 
   if (authToken) {
     headers.Authorization = `key=${authToken}`;
+  } else if (endpoint.indexOf(TEMP_GCM_URL) !== -1) {
+    throw new Error('GCM requires an Auth Token parameter');
   }
 
   return new Promise(function(resolve, reject) {
@@ -69,7 +76,8 @@ function sendWebPush(message, subscription, authToken) {
         reject(error);
       } else {
         resolve({
-          status: `${response.statusCode} ${response.statusMessage}`,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
           body: body
         });
       }
