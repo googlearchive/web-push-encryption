@@ -11,12 +11,14 @@
     "eslint-config-google": "^0.3.0",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.1.1",
-    "proxyquire": "^1.7.4",
+    "jsdoc": "^3.4.0",
     "require-dir": "^0.3.0",
+    "proxyquire": "^1.7.4",
     "sinon": "^1.17.3"
   },
   "scripts": {
-    "test": "gulp lint && mocha"
+    "test": "gulp lint && mocha",
+    "build-docs": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json"
   },
   "keywords": [
     "web",
