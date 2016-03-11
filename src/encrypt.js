@@ -18,7 +18,6 @@
 
 const crypto = require('crypto');
 
-const PADDING_BUFFER = new Buffer(2).fill(0);
 const ONE_BUFFER = new Buffer(1).fill(1);
 const AUTH_INFO = new Buffer('Content-Encoding: auth\0', 'utf8');
 const MAX_PAYLOAD_LENGTH = 4080;
@@ -31,15 +30,20 @@ const MAX_PAYLOAD_LENGTH = 4080;
  * - {@link https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman}
  * - {@link https://tools.ietf.org/html/draft-ietf-webpush-encryption}
  *
- * @param  {String} message      The message to be sent
- * @param  {Object} subscription The subscription details for the client
- * @return {Object}              An Object containing the encrypted payload and
- *                               the other encryption information needed to send
- *                               the message.
+ * @param  {String} message       The message to be sent
+ * @param  {Object} subscription  The subscription details for the client
+ * @param  {number} paddingLength Number of bytes of padding to use
+ * @return {Object}               An Object containing the encrypted payload and
+ *                                the other encryption information needed to
+ *                                send the message.
  */
-function encrypt(message, subscription) {
+function encrypt(message, subscription, paddingLength) {
+  paddingLength = paddingLength || 0;
+
   // Create Buffers for all of the inputs
-  const plaintext = new Buffer(message, 'utf8');
+  const padding = makePadding(paddingLength);
+  const plaintext = Buffer.concat([padding, new Buffer(message, 'utf8')]);
+
   if (plaintext.length > MAX_PAYLOAD_LENGTH) {
     throw new Error(`Payload is too large. The max number of ` +
       `bytes is ${MAX_PAYLOAD_LENGTH}, input is ${plaintext.length} bytes.`);
@@ -199,8 +203,22 @@ function hkdf(salt, ikm, info, length) {
 }
 
 /**
+ * Creates a buffer of padding bytes. The first two bytes hold the length of the
+ * rest of the buffer, encoded as a 16-bit integer.
+ * @param  {number} length How long the padding should be
+ * @return {Buffer}        The new buffer
+ */
+function makePadding(length) {
+  const buffer = new Buffer(2 + length);
+  buffer.fill(0);
+  buffer.writeUInt16BE(length, 0);
+  return buffer;
+}
+
+/**
  * Encrypt the plaintext message using AES128/GCM
- * @param  {Buffer} plaintext            The message to be encrypted
+ * @param  {Buffer} plaintext            The message to be encrypted, including
+ *                                       padding.
  * @param  {Buffer} contentEncryptionKey The private key to use
  * @param  {Buffer} nonce                The iv
  * @return {Buffer}                      The encrypted payload
@@ -208,16 +226,13 @@ function hkdf(salt, ikm, info, length) {
 function encryptPayload(plaintext, contentEncryptionKey, nonce) {
   const cipher = crypto.createCipheriv('id-aes128-GCM', contentEncryptionKey,
       nonce);
-  // TODO: This is the minimum padding buffer. We could instead use this to
-  // obscure the length of the payload by choosing a different padding length
-  // based on the length of the plaintext.
-  const paddingResult = cipher.update(PADDING_BUFFER);
-  const textResult = cipher.update(plaintext);
+  const result = cipher.update(plaintext);
   cipher.final();
 
-  return Buffer.concat([paddingResult, textResult, cipher.getAuthTag()]);
+  return Buffer.concat([result, cipher.getAuthTag()]);
 }
 
 // All functions are exported here to make them testable, but only `encrypt` is
 // re-exported by `index.js` as part of the public API.
-module.exports = {encrypt, createContext, createInfo, hkdf, encryptPayload};
+module.exports = {encrypt, createContext, createInfo, hkdf, makePadding,
+    encryptPayload};
