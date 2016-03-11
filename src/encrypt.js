@@ -20,7 +20,7 @@ const crypto = require('crypto');
 
 const ONE_BUFFER = new Buffer(1).fill(1);
 const AUTH_INFO = new Buffer('Content-Encoding: auth\0', 'utf8');
-const MAX_PAYLOAD_LENGTH = 4080;
+const MAX_PAYLOAD_LENGTH = 4078;
 
 /**
  * Encrypts a message such that it can be sent using the Web Push protocol.
@@ -42,12 +42,16 @@ function encrypt(message, subscription, paddingLength) {
 
   // Create Buffers for all of the inputs
   const padding = makePadding(paddingLength);
-  const plaintext = Buffer.concat([padding, new Buffer(message, 'utf8')]);
+  const messageBuffer = new Buffer(message, 'utf8');
 
-  if (plaintext.length > MAX_PAYLOAD_LENGTH) {
+  // The maximum size of the message + padding is 4078 bytes
+  if ((messageBuffer.length + paddingLength) > MAX_PAYLOAD_LENGTH) {
     throw new Error(`Payload is too large. The max number of ` +
-      `bytes is ${MAX_PAYLOAD_LENGTH}, input is ${plaintext.length} bytes.`);
+      `bytes is ${MAX_PAYLOAD_LENGTH}, input is ${messageBuffer.length} ` +
+      `bytes plus ${paddingLength} bytes of padding.`);
   }
+
+  const plaintext = Buffer.concat([padding, messageBuffer]);
 
   if (!subscription || !subscription.keys) {
     throw new Error('Subscription has no encryption details.');
