@@ -72,20 +72,22 @@ function addAuthToken(pattern, token) {
 
 /**
  * Sends a message using the Web Push protocol
- * @param  {String}   message      The message to send
  * @param  {Object}   subscription The subscription details for the client we
  *                                 are sending to
+ * @param  {String}   message      The message to send
  * @return {Promise} A promise that resolves if the push was sent successfully
  *                   with status and body.
  */
-function sendWebPush(message, subscription) {
+function sendWebPush(subscription, message) {
+  if (
+    !subscription || !subscription.endpoint ||
+    !message || typeof message !== 'string') {
+    throw new Error('sendWebPush() expects a subscription endpoint with ' +
+      'an endpoint parameter and a string send with the push message.');
+  }
+
   let endpoint = subscription.endpoint;
   const authToken = getAuthToken(endpoint);
-
-  // If the endpoint is GCM then we temporarily need to rewrite it, as not all
-  // GCM servers support the Web Push protocol. This should go away in the
-  // future.
-  endpoint = endpoint.replace(GCM_URL, TEMP_GCM_URL);
 
   const payload = encrypt(message, subscription);
   const headers = {
@@ -95,7 +97,15 @@ function sendWebPush(message, subscription) {
 
   if (authToken) {
     headers.Authorization = 'key=' + authToken;
+  } else if (endpoint.indexOf(GCM_URL) !== -1) {
+    throw new Error('GCM requires an Auth Token. Please add one using the' +
+      'addAuthToken() method.');
   }
+
+  // If the endpoint is GCM then we temporarily need to rewrite it, as not all
+  // GCM servers support the Web Push protocol. This should go away in the
+  // future.
+  endpoint = endpoint.replace(GCM_URL, TEMP_GCM_URL);
 
   return new Promise(function(resolve, reject) {
     request.post(endpoint, {
@@ -106,7 +116,8 @@ function sendWebPush(message, subscription) {
         reject(error);
       } else {
         resolve({
-          status: `${response.statusCode} ${response.statusMessage}`,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
           body: body
         });
       }
