@@ -41,7 +41,7 @@ function encrypt(message, subscription, paddingLength) {
   paddingLength = paddingLength || 0;
 
   // Create Buffers for all of the inputs
-  const padding = makePadding(paddingLength);
+  const paddingBuffer = makePadding(paddingLength);
   const messageBuffer = new Buffer(message, 'utf8');
 
   // The maximum size of the message + padding is 4078 bytes
@@ -51,7 +51,7 @@ function encrypt(message, subscription, paddingLength) {
       `bytes plus ${paddingLength} bytes of padding.`);
   }
 
-  const plaintext = Buffer.concat([padding, messageBuffer]);
+  const plaintext = Buffer.concat([paddingBuffer, messageBuffer]);
 
   if (!subscription || !subscription.keys) {
     throw new Error('Subscription has no encryption details.');
@@ -238,5 +238,4 @@ function encryptPayload(plaintext, contentEncryptionKey, nonce) {
 
 // All functions are exported here to make them testable, but only `encrypt` is
 // re-exported by `index.js` as part of the public API.
-module.exports = {encrypt, createContext, createInfo, hkdf, makePadding,
-    encryptPayload};
+module.exports = encrypt;

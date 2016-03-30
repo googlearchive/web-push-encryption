@@ -116,8 +116,5 @@ function sendWebPush(message, subscription) {
 
 module.exports = {
   sendWebPush,
-  addAuthToken,
-  ub64,
-  createHeaderField,
-  getAuthToken
+  addAuthToken
 };
