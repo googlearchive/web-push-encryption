@@ -9,6 +9,43 @@ This library provides the functions necessary to encrypt a payload for sending
 with the Web Push protocol. It also includes a helper function for actually
 send the message to the Web Push endpoint.
 
+What is this for?
+-----------------
+
+The [Push API](http://w3c.github.io/push-api/) allow users to subscribe for
+notifications from a web site, which can be delivered to them even if the
+browser has been closed. This was first shipped as part of Chrome 42, but the
+push message could not contain any payload data.
+
+As of Chrome 50 and Firefox 44 (desktop-only) payloads are supported, but the
+server must encrypt the payload or the receiving browser will reject it.
+
+This library implements the necessary encryption as a Node module.
+
+Overview
+--------
+
+Install the module using npm:
+
+`npm install web-push-encryption`
+
+Require the module:
+
+`var webpush = require('web-push-encryption');`
+
+Send a message:
+
+`webpush.sendWebPush('Yay! Web Push!', subscription);`
+
+If the push service requires an authentication header (notably Google Cloud
+Messaging, used by Chrome) then you can add that as a third parameter:
+
+```
+if (subscription.endpoint.indexOf('https://android.googleapis.com/gcm/send/') === 0) {
+  webpush.sendWebPush('A message for Chrome', subscription, MY_GCM_KEY);
+}
+```
+
 Support
 -------
 
