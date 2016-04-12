@@ -6,3 +6,7 @@ node_js:
 
 install:
   - npm install
+
+script:
+  - npm test
+  - ./node_modules/sw-testing-helpers/project/publish-docs.sh master

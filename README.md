@@ -1,9 +1,7 @@
 Push Encryption (node)
 ----------------------
 
-[![Travis Build Status](https://travis-ci.org/GoogleChrome/push-encryption-node.svg?branch=master)](https://travis-ci.org/GoogleChrome/push-encryption-node)
-
-[![Dependency Badge from David](https://david-dm.org/GoogleChrome/push-encryption-node.svg)](https://david-dm.org/GoogleChrome/push-encryption-node)
+[![Travis Build Status](https://travis-ci.org/GoogleChrome/push-encryption-node.svg?branch=master)](https://travis-ci.org/GoogleChrome/push-encryption-node) [![Dependency Badge from David](https://david-dm.org/GoogleChrome/push-encryption-node.svg)](https://david-dm.org/GoogleChrome/push-encryption-node) [![devDependency Status](https://david-dm.org/GoogleChrome/push-encryption-node/dev-status.svg)](https://david-dm.org/GoogleChrome/push-encryption-node#info=devDependencies)
 
 This library provides the functions necessary to encrypt a payload for sending
 with the Web Push protocol. It also includes a helper function for actually
@@ -45,6 +43,11 @@ if (subscription.endpoint.indexOf('https://android.googleapis.com/gcm/send/') ==
   webpush.sendWebPush('A message for Chrome', subscription, MY_GCM_KEY);
 }
 ```
+
+Docs
+-----
+
+You can [find docs here](https://googlechrome.github.io/push-encryption-node/).
 
 Support
 -------

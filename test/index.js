@@ -208,7 +208,7 @@ describe('Test the Libraries Top Level API', function() {
       ).to.throw('Payload is too large. The max number of bytes is 4078, input is 5000 bytes plus 0 bytes of padding.');
 
       expect(() => library.encrypt(EXAMPLE_INPUT, VALID_SUBSCRIPTION, 4080))
-        .to.throw('Payload is too large. The max number of bytes is 4078, input is 13 bytes plus 4080 bytes of padding.')
+        .to.throw('Payload is too large. The max number of bytes is 4078, input is 13 bytes plus 4080 bytes of padding.');
     });
   });
 
