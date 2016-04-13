@@ -19,8 +19,12 @@
 const encrypt = require('./encrypt');
 const push = require('./push');
 
-// Exports the public API
+/**
+ * web-push-encryption is a module that helps encrypt and / or send push
+ * messages over the web push protocol.
+ * @namespace web-push-encryption
+ */
 module.exports = {
   encrypt: encrypt,
-  sendWebPush: push.sendWebPush
+  sendWebPush: push
 };
