@@ -75,6 +75,17 @@ function sendWebPush(message, subscription, authToken) {
       if (error) {
         reject(error);
       } else {
+        if (response.statusCode >= 400 && response.statusCode < 500) {
+          // Subscription is invalid:
+          // https://tools.ietf.org/html/draft-ietf-webpush-protocol-04#section-8.3
+          return reject({
+            code: 'expired-subscription',
+            statusCode: response.statusCode,
+            statusMessage: response.statusMessage,
+            body: body
+          });
+        }
+
         resolve({
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
