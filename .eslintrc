@@ -1,7 +1,0 @@
-{
-  "extends": "google",
-  "rules": {
-    # We current have a TODO comment that causes this error
-    "no-warning-comments": 0
-  }
-}
