@@ -26,12 +26,19 @@ const MAX_PAYLOAD_LENGTH = 4078;
  * Encrypts a message such that it can be sent using the Web Push protocol.
  *
  * You can find out more about the various pieces:
- * - {@link https://tools.ietf.org/html/draft-ietf-httpbis-encryption-encoding}
- * - {@link https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman}
- * - {@link https://tools.ietf.org/html/draft-ietf-webpush-encryption}
  *
+ * <ul>
+ *  <li>{@link https://tools.ietf.org/html/draft-ietf-httpbis-encryption-encoding}</li>
+ *  <li>{@link https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman}</li>
+ *  <li>{@link https://tools.ietf.org/html/draft-ietf-webpush-encryption}</li>
+ * </ul>
+ *
+ * @memberof web-push-encryption
  * @param  {String|Buffer} message The message to be sent
- * @param  {Object} subscription  The subscription details for the client
+ * @param  {Object} subscription  A JavaScript Object representing a
+ * [PushSubscription]{@link https://developer.mozilla.org/en-US/docs/Web/API/PushSubscription}.
+ * The easiest way to get this from the browser to your backend is by running
+ * <code>JSON.stringify(subscription)</code> in a web pages JavaScript.
  * @param  {number} paddingLength Number of bytes of padding to use
  * @return {Object}               An Object containing the encrypted payload and
  *                                the other encryption information needed to
@@ -120,6 +127,8 @@ function encrypt(message, subscription, paddingLength) {
  * Creates a context for deriving encyption parameters.
  * See section 4.2 of
  * {@link https://tools.ietf.org/html/draft-ietf-httpbis-encryption-encoding-00}
+ *
+ * @private
  * @param  {Buffer} clientPublicKey The client's public key
  * @param  {Buffer} serverPublicKey Our public key
  * @return {Buffer} context
@@ -154,6 +163,8 @@ function createContext(clientPublicKey, serverPublicKey) {
 /**
  * Returns an info record. See sections 3.2 and 3.3 of
  * {@link https://tools.ietf.org/html/draft-ietf-httpbis-encryption-encoding-00}
+ *
+ * @private
  * @param  {String} type    The type of the info record
  * @param  {Buffer} context The context for the record
  * @return {Buffer} info
@@ -195,6 +206,7 @@ function createInfo(type, context) {
  *
  * See {@link https://www.rfc-editor.org/rfc/rfc5869.txt}
  *
+ * @private
  * @param  {Buffer} salt   A non-secret random value
  * @param  {Buffer} ikm    Input keying material
  * @param  {Buffer} info   Application-specfic context
@@ -217,6 +229,7 @@ function hkdf(salt, ikm, info, length) {
 /**
  * Creates a buffer of padding bytes. The first two bytes hold the length of the
  * rest of the buffer, encoded as a 16-bit integer.
+ * @private
  * @param  {number} length How long the padding should be
  * @return {Buffer}        The new buffer
  */
@@ -229,6 +242,7 @@ function makePadding(length) {
 
 /**
  * Encrypt the plaintext message using AES128/GCM
+ * @private
  * @param  {Buffer} plaintext            The message to be encrypted, including
  *                                       padding.
  * @param  {Buffer} contentEncryptionKey The private key to use

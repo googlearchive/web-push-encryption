@@ -24,6 +24,8 @@ const TEMP_GCM_URL = 'https://gcm-http.googleapis.com/gcm';
 
 /**
  * URL safe Base64 encoder
+ *
+ * @private
  * @param  {Buffer} buffer The data to encode
  * @return {String} URL safe base 64 encoded string
  */
@@ -35,6 +37,8 @@ function ub64(buffer) {
 
 /**
  * Sends a message using the Web Push protocol
+ *
+ * @memberof web-push-encryption
  * @param  {String}   message      The message to send
  * @param  {Object}   subscription The subscription details for the client we
  *                                 are sending to
@@ -85,4 +89,4 @@ function sendWebPush(message, subscription, authToken) {
   });
 }
 
-module.exports = {sendWebPush};
+module.exports = sendWebPush;
