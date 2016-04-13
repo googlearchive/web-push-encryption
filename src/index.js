@@ -21,7 +21,6 @@ const push = require('./push');
 
 // Exports the public API
 module.exports = {
-  encrypt: encrypt.encrypt,
-  sendWebPush: push.sendWebPush,
-  addAuthToken: push.addAuthToken
+  encrypt: encrypt,
+  sendWebPush: push.sendWebPush
 };

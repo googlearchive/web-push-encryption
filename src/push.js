@@ -17,7 +17,7 @@
 'use strict';
 
 const request = require('request');
-const encrypt = require('./encrypt').encrypt;
+const encrypt = require('./encrypt');
 
 const GCM_URL = 'https://android.googleapis.com/gcm/send';
 const TEMP_GCM_URL = 'https://gcm-http.googleapis.com/gcm';
@@ -34,67 +34,37 @@ function ub64(buffer) {
 }
 
 /**
- * A helper for creating the value part of the HTTP encryption headers
- * @param  {String} name  The name of the header field
- * @param  {Buffer} value The value of the field
- * @return {String} String representation of the header
- */
-function createHeaderField(name, value) {
-  return `${name}=${ub64(value)}`;
-}
-
-const authTokens = [];
-
-/**
- * Returns the appropriate authentication token, if any, for the endpoint we are
- * trying to send to.
- * @param  {String} endpoint URL of the endpoint
- * @return {String}          The authentication token
- */
-function getAuthToken(endpoint) {
-  for (let i = 0; i < authTokens.length; i++) {
-    if (endpoint.indexOf(authTokens[i].pattern) !== -1) {
-      return authTokens[i].token;
-    }
-  }
-}
-
-/**
- * Adds a new authentication token. The pattern is a simple string. An endpoint
- * will use the given authentication token if the pattern is a substring of the
- * endpoint.
- * @param {String} pattern The pattern to match on
- * @param {String} token   The authentication token
- */
-function addAuthToken(pattern, token) {
-  authTokens.push({pattern, token});
-}
-
-/**
  * Sends a message using the Web Push protocol
  * @param  {String}   message      The message to send
  * @param  {Object}   subscription The subscription details for the client we
  *                                 are sending to
+ * @param  {String}   authToken    Optional token to be used in the
+ *                                 `Authentication` header if the endpoint
+ *                                 requires it.
  * @return {Promise} A promise that resolves if the push was sent successfully
  *                   with status and body.
  */
-function sendWebPush(message, subscription) {
-  let endpoint = subscription.endpoint;
-  const authToken = getAuthToken(endpoint);
+function sendWebPush(message, subscription, authToken) {
+  if (!subscription || !subscription.endpoint) {
+    throw new Error('sendWebPush() expects a subscription endpoint with ' +
+      'an endpoint parameter.');
+  }
 
   // If the endpoint is GCM then we temporarily need to rewrite it, as not all
   // GCM servers support the Web Push protocol. This should go away in the
   // future.
-  endpoint = endpoint.replace(GCM_URL, TEMP_GCM_URL);
+  const endpoint = subscription.endpoint.replace(GCM_URL, TEMP_GCM_URL);
 
   const payload = encrypt(message, subscription);
   const headers = {
-    'Encryption': createHeaderField('salt', payload.salt),
-    'Crypto-Key': createHeaderField('dh', payload.serverPublicKey)
+    'Encryption': `salt=${ub64(payload.salt)}`,
+    'Crypto-Key': `dh=${ub64(payload.serverPublicKey)}`
   };
 
   if (authToken) {
-    headers.Authorization = 'key=' + authToken;
+    headers.Authorization = `key=${authToken}`;
+  } else if (endpoint.indexOf(TEMP_GCM_URL) !== -1) {
+    throw new Error('GCM requires an Auth Token parameter');
   }
 
   return new Promise(function(resolve, reject) {
@@ -106,7 +76,8 @@ function sendWebPush(message, subscription) {
         reject(error);
       } else {
         resolve({
-          status: `${response.statusCode} ${response.statusMessage}`,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
           body: body
         });
       }
@@ -114,10 +85,4 @@ function sendWebPush(message, subscription) {
   });
 }
 
-module.exports = {
-  sendWebPush,
-  addAuthToken,
-  ub64,
-  createHeaderField,
-  getAuthToken
-};
+module.exports = {sendWebPush};

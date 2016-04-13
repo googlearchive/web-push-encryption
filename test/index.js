@@ -25,7 +25,6 @@ const EXAMPLE_SERVER_KEYS = {
   public: 'BOg5KfYiBdDDRF12Ri17y3v+POPr8X0nVP2jDjowPVI/DMKU1aQ3OLdPH1iaakvR9/PHq6tNCzJH35v/JUz2crY=',
   private: 'uDNsfsz91y2ywQeOHljVoiUg3j5RGrDVAswRqjP3v90='
 };
-
 const EXAMPLE_SALT = 'AAAAAAAAAAAAAAAAAAAAAA==';
 
 const EXAMPLE_INPUT = 'Hello, World.';
@@ -57,6 +56,11 @@ const INVALID_P256DH_SUBSCRIPTION = {
 
 const SUBSCRIPTION_NO_KEYS = {
   endpoint: 'https://example-endpoint.com/example/1234'
+};
+
+const GCM_SUBSCRIPTION_EXAMPLE = {
+  original: 'https://android.googleapis.com/gcm/send/AAAAAAAAAAA:AAA91AAAA2_A7AAAAAAAAAAAAAAAAAAAAAAAAAAA9AAAAA9AAA_AAAA8AAAAAA5-AAAAAA2AAAA_AAAAA4A51A_A3AAA1AAAAAAAAAAAAAAA3AAAAAAAAA6AA2AAAAAAAA80AAAAAA',
+  webpush: 'https://gcm-http.googleapis.com/gcm/AAAAAAAAAAA:AAA91AAAA2_A7AAAAAAAAAAAAAAAAAAAAAAAAAAA9AAAAA9AAA_AAAA8AAAAAA5-AAAAAA2AAAA_AAAAA4A51A_A3AAA1AAAAAAAAAAAAAAA3AAAAAAAAA6AA2AAAAAAAA80AAAAAA'
 };
 
 const SALT_LENGTH = 16;
@@ -194,14 +198,185 @@ describe('Test the Libraries Top Level API', function() {
 
       expect(
         () => library.encrypt(largeInput.toString('utf8'), VALID_SUBSCRIPTION)
-      ).to.throw('Payload is too large. The max number of bytes is 4080, input is 4081 bytes.');
+      ).to.throw('Payload is too large. The max number of bytes is 4078, input is 4081 bytes plus 0 bytes of padding.');
 
       largeInput = new Buffer(5000);
       largeInput.fill(0);
 
       expect(
         () => library.encrypt(largeInput.toString('utf8'), VALID_SUBSCRIPTION)
-      ).to.throw('Payload is too large. The max number of bytes is 4080, input is 5000 bytes.');
+      ).to.throw('Payload is too large. The max number of bytes is 4078, input is 5000 bytes plus 0 bytes of padding.');
+
+      expect(() => library.encrypt(EXAMPLE_INPUT, VALID_SUBSCRIPTION, 4080))
+        .to.throw('Payload is too large. The max number of bytes is 4078, input is 13 bytes plus 4080 bytes of padding.')
+    });
+  });
+
+  describe('Test sendWebPush() method', function() {
+    it('should throw an error when no input provided', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush()
+      ).to.throw('sendWebPush() expects a subscription endpoint with ' +
+        'an endpoint parameter.');
+    });
+
+    it('should throw an error when the subscription object has no endpoint', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush({})
+      ).to.throw('sendWebPush() expects a subscription endpoint with ' +
+        'an endpoint parameter.');
+    });
+
+    it('should throw an error when a message is passed in with no subscription', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush('Message')
+      ).to.throw('sendWebPush() expects a subscription endpoint with ' +
+        'an endpoint parameter.');
+    });
+
+    it('should throw an error when a subscription is passed in with array as payload data', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush([
+          {
+            hello: 'world'
+          },
+          'This is a test',
+          Promise.resolve('Promise Resolve'),
+          Promise.reject('Promise Reject')
+        ], VALID_SUBSCRIPTION)
+      ).to.throw('Message must be a String or a Buffer');
+    });
+
+    it('should throw an error when a subscription with no encryption details is passed in with string as payload data', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush('Hello, World!', {
+          endpoint: 'http://fakendpoint'
+        })
+      ).to.throw('Subscription has no encryption details.');
+    });
+
+    it('should attempt a web push protocol request', function() {
+      const requestReplacement = {
+        post: (endpoint, data, cb) => {
+          endpoint.should.equal(VALID_SUBSCRIPTION.endpoint);
+
+          Buffer.isBuffer(data.body).should.equal(true);
+          data.headers.Encryption.should.have.length(27);
+          data.headers['Crypto-Key'].should.have.length(90);
+
+          cb(
+            null,
+            {
+              statusCode: 200,
+              statusMessage: 'Status message'
+            },
+            'Response body'
+          );
+        }
+      };
+      const pushProxy = proxyquire('../src/push.js', {
+        'request': requestReplacement
+      });
+      const library = proxyquire('../src/index.js', {
+        './push': pushProxy
+      });
+      return library.sendWebPush('Hello, World!', VALID_SUBSCRIPTION)
+      .then(response => {
+        response.statusCode.should.equal(200);
+        response.statusMessage.should.equal('Status message');
+        response.body.should.equal('Response body');
+      });
+    });
+
+    it('should attempt a web push protocol request for GCM', function() {
+      const API_KEY = 'AAAA';
+      const gcmSubscription = {
+        endpoint: GCM_SUBSCRIPTION_EXAMPLE.original,
+        keys: VALID_SUBSCRIPTION.keys
+      };
+      const requestReplacement = {
+        post: (endpoint, data, cb) => {
+          endpoint.should.equal(GCM_SUBSCRIPTION_EXAMPLE.webpush);
+
+          Buffer.isBuffer(data.body).should.equal(true);
+          data.headers.Encryption.should.have.length(27);
+          data.headers['Crypto-Key'].should.have.length(90);
+          data.headers.Authorization.should.equal('key=' + API_KEY);
+
+          cb(
+            null,
+            {
+              statusCode: 200,
+              statusMessage: 'Status message'
+            },
+            'Response body'
+          );
+        }
+      };
+
+      const pushProxy = proxyquire('../src/push.js', {
+        'request': requestReplacement
+      });
+      const library = proxyquire('../src/index.js', {
+        './push': pushProxy
+      });
+      return library.sendWebPush('Hello, World!', gcmSubscription, API_KEY)
+      .then(response => {
+        response.statusCode.should.equal(200);
+        response.statusMessage.should.equal('Status message');
+        response.body.should.equal('Response body');
+      });
+    });
+
+    it('should throw an error when not providing an AuthToken for a GCM subscription', function() {
+      const gcmSubscription = {
+        endpoint: GCM_SUBSCRIPTION_EXAMPLE.original,
+        keys: VALID_SUBSCRIPTION.keys
+      };
+
+      const library = require('../src/index.js');
+      expect(
+        () => library.sendWebPush('Hello, World!', gcmSubscription)
+      ).to.throw('GCM requires an Auth Token parameter');
+    });
+
+    it('should handle errors from request', function() {
+      const EXAMPLE_ERROR = 'Example Error';
+
+      const requestReplacement = {
+        post: (endpoint, data, cb) => {
+          endpoint.should.equal(VALID_SUBSCRIPTION.endpoint);
+
+          Buffer.isBuffer(data.body).should.equal(true);
+          data.headers.Encryption.should.have.length(27);
+          data.headers['Crypto-Key'].should.have.length(90);
+
+          cb(EXAMPLE_ERROR);
+        }
+      };
+      const pushProxy = proxyquire('../src/push.js', {
+        'request': requestReplacement
+      });
+      const library = proxyquire('../src/index.js', {
+        './push': pushProxy
+      });
+      return library.sendWebPush('Hello, World!', VALID_SUBSCRIPTION)
+      .then(() => {
+        throw new Error('The promise was expected to reject.');
+      })
+      .catch(err => {
+        err.should.equal(EXAMPLE_ERROR);
+      });
     });
   });
 });
