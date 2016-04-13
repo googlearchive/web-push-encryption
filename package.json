@@ -11,15 +11,19 @@
     "eslint-config-google": "^0.3.0",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.1.1",
-    "jsdoc": "^3.4.0",
     "gulp-mocha": "^2.2.0",
-    "require-dir": "^0.3.0",
+    "jsdoc": "^3.4.0",
     "proxyquire": "^1.7.4",
-    "sinon": "^1.17.3"
+    "require-dir": "^0.3.0",
+    "sinon": "^1.17.3",
+    "sw-testing-helpers": "0.0.12"
   },
   "scripts": {
     "test": "gulp lint test:manual",
-    "build-docs": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json"
+    "build-docs": "jsdoc -c jsdoc.json",
+    "bundle": "./project/copy-bundle-files.sh",
+    "publish": "./node_modules/sw-testing-helpers/project/publish-release.sh",
+    "build": "echo \"Skipping build step\""
   },
   "keywords": [
     "web",
