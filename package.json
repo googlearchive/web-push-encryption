@@ -19,7 +19,7 @@
   },
   "scripts": {
     "test": "gulp lint test:manual",
-    "build-docs": "./node_modules/jsdoc/jsdoc.js -c jsdoc.json"
+    "build-docs": "jsdoc -c jsdoc.json"
   },
   "keywords": [
     "web",
