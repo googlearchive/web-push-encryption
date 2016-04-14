@@ -61,6 +61,7 @@ function sendWebPush(message, subscription, authToken) {
 
   const payload = encrypt(message, subscription);
   const headers = {
+    'Content-Encoding': 'aesgcm',
     'Encryption': `salt=${ub64(payload.salt)}`,
     'Crypto-Key': `dh=${ub64(payload.serverPublicKey)}`
   };
