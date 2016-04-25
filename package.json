@@ -1,8 +1,15 @@
 {
   "name": "web-push-encryption",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "A library that handles payload encryption for the Web Push protocol",
   "main": "src/index.js",
+  "scripts": {
+    "test": "gulp lint test:manual",
+    "build-docs": "jsdoc -c jsdoc.json",
+    "bundle": "./project/copy-bundle-files.sh",
+    "npm-publish": "./node_modules/sw-testing-helpers/project/publish-release.sh",
+    "build": "echo \"Skipping build step\""
+  },
   "dependencies": {
     "request": "^2.67.0"
   },
@@ -17,13 +24,6 @@
     "require-dir": "^0.3.0",
     "sinon": "^1.17.3",
     "sw-testing-helpers": "0.0.12"
-  },
-  "scripts": {
-    "test": "gulp lint test:manual",
-    "build-docs": "jsdoc -c jsdoc.json",
-    "bundle": "./project/copy-bundle-files.sh",
-    "publish": "./node_modules/sw-testing-helpers/project/publish-release.sh",
-    "build": "echo \"Skipping build step\""
   },
   "keywords": [
     "web",
