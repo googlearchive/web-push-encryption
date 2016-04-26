@@ -1,7 +1,7 @@
 Push Encryption (node)
 ----------------------
 
-[![Travis Build Status](https://travis-ci.org/GoogleChrome/push-encryption-node.svg?branch=master)](https://travis-ci.org/GoogleChrome/push-encryption-node) [![Dependency Badge from David](https://david-dm.org/GoogleChrome/push-encryption-node.svg)](https://david-dm.org/GoogleChrome/push-encryption-node) [![devDependency Status](https://david-dm.org/GoogleChrome/push-encryption-node/dev-status.svg)](https://david-dm.org/GoogleChrome/push-encryption-node#info=devDependencies)
+[![Travis Build Status](https://travis-ci.org/GoogleChrome/web-push-encryption.svg?branch=master)](https://travis-ci.org/GoogleChrome/web-push-encryption) [![Dependency Badge from David](https://david-dm.org/GoogleChrome/web-push-encryption.svg)](https://david-dm.org/GoogleChrome/web-push-encryption) [![devDependency Status](https://david-dm.org/GoogleChrome/web-push-encryption/dev-status.svg)](https://david-dm.org/GoogleChrome/web-push-encryption#info=devDependencies)
 
 This library provides the functions necessary to encrypt a payload for sending
 with the Web Push protocol. It also includes a helper function for actually
