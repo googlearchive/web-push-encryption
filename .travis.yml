@@ -3,7 +3,10 @@ language: node_js
 node_js:
   - '4'
   - 'stable'
-
+env:
+  global:
+    - GH_REF: github.com/googlechrome/web-push-encryption.git
+    - secure: "PccQoVoj6hQS3jndVrWQRJ2OMOUSAFDDNMwfBDwqBiRfE0zc5hjFWadfpBNwzaiEGXZcmn6vMjlg1MmtCqyO3ytyk2CK/fMAu18xhbZGrQYdY9wEKzRwxdrACsdq7pjDzJrDlcT0iY/Fxc+/SjnJ3t8ppWot14unUbWb33EJXzZ/nxKcz9G8hn0RdHeg30J/8ExC5uwYIK+Kq1wGfzcGJ/Q8RhopEVYlUYqVY0LMnqAuQCdLJXYd+6XtNZJFJRTzlPI1ehVLJ3NdfY7CK0EE3TPTuwEIIICYhp7J2wxdBFjITlTE//LEgGdBPuGvGlRxTnloZOQH1YdQf+WCDtbg088tUl5t4l2qkOdNS7U+lI45srAPK2Sg0Yl8fW9kGFpvRYiSifnSVGpzx7KOhT5g9UPK3Deu/738dJWQhjVaXaQYW7ZHvab8krRH3AsMd8wJhXw6WHsgEoxboowQMNn4CmlrjCvL9Z+SdmxVsXbUhHocFtmqGONZRn0Pbu1H2Oj0OPd7XdyGewH04l+AdAHbDVOEI0ilGTgqIpQUVfH7ie0vVaIDrWdNrInsWICphTutD3f2qKytf2qVkxQb4wLFy+0brAmXA3STazDKddbjczIkMV0cegFFNleKRbWY0+w+0MER4kLf4V96o1B2PiFw3Uk0Rs6dbloFFoXGpZuJlR4="
 install:
   - npm install
 
