@@ -413,7 +413,7 @@ describe('Test the Libraries Top Level API', function() {
         './push': pushProxy
       });
       return library.sendWebPush('Hello, World!', INVALID_SUBSCRIPTION)
-      .then(response => {
+      .then(() => {
         done(new Error('This should have rejected'));
       })
       .catch(err => {
@@ -448,7 +448,7 @@ describe('Test the Libraries Top Level API', function() {
         './push': pushProxy
       });
       return library.sendWebPush('Hello, World!', INVALID_SUBSCRIPTION)
-      .then(response => {
+      .then(() => {
         done(new Error('This should have rejected'));
       })
       .catch(err => {

@@ -47,13 +47,13 @@ if (subscription.endpoint.indexOf('https://android.googleapis.com/gcm/send/') ==
 Docs
 -----
 
-You can [find docs here](https://googlechrome.github.io/push-encryption-node/).
+You can [find docs here](https://googlechrome.github.io/web-push-encryption/).
 
 Support
 -------
 
 If you've found an error in this library, please file an issue:
-https://github.com/GoogleChrome/push-encryption-node/issues
+https://github.com/GoogleChrome/web-push-encryption/issues
 
 Patches are encouraged, and may be submitted by forking this project and
 submitting a pull request through GitHub.
