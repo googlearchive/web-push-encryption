@@ -69,7 +69,7 @@ function sendWebPush(message, subscription, paddingLength) {
   const endpoint = subscription.endpoint.replace(GCM_URL, TEMP_GCM_URL);
   const headers = {
     // TODO: Make TTL variable
-    Ttl: '0'
+    TTL: '0'
   };
   let body;
 
