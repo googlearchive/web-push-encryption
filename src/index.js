@@ -26,5 +26,6 @@ const push = require('./push');
  */
 module.exports = {
   encrypt: encrypt,
-  sendWebPush: push
+  sendWebPush: push.sendWebPush,
+  setGCMAPIKey: push.setGCMAPIKey
 };
