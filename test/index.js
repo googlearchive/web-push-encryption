@@ -298,7 +298,7 @@ describe('Test the Libraries Top Level API', function() {
       const library = proxyquire('../src/index.js', {
         './push': pushProxy
       });
-      return library.sendWebPush('Hello, World!', VALID_SUBSCRIPTION)
+      return library.sendWebPush(new Buffer('Hello, World!', 'utf8'), VALID_SUBSCRIPTION)
       .then(response => {
         response.statusCode.should.equal(200);
         response.statusMessage.should.equal('Status message');
@@ -338,7 +338,8 @@ describe('Test the Libraries Top Level API', function() {
       const library = proxyquire('../src/index.js', {
         './push': pushProxy
       });
-      return library.sendWebPush('Hello, World!', gcmSubscription, API_KEY)
+      library.setGCMAPIKey(API_KEY);
+      return library.sendWebPush('Hello, World!', gcmSubscription)
       .then(response => {
         response.statusCode.should.equal(200);
         response.statusMessage.should.equal('Status message');

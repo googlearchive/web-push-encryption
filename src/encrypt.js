@@ -258,6 +258,4 @@ function encryptPayload(plaintext, contentEncryptionKey, nonce) {
   return Buffer.concat([result, cipher.getAuthTag()]);
 }
 
-// All functions are exported here to make them testable, but only `encrypt` is
-// re-exported by `index.js` as part of the public API.
 module.exports = encrypt;

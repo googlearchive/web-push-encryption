@@ -22,6 +22,16 @@ const encrypt = require('./encrypt');
 const GCM_URL = 'https://android.googleapis.com/gcm/send';
 const TEMP_GCM_URL = 'https://gcm-http.googleapis.com/gcm';
 
+let gcmAuthToken;
+
+/**
+ * Set the key to use in the Authentication header for GCM requests
+ * @param {String} key The API key to use
+ */
+function setGCMAPIKey(key) {
+  gcmAuthToken = key;
+}
+
 /**
  * URL safe Base64 encoder
  *
@@ -42,13 +52,12 @@ function ub64(buffer) {
  * @param  {String}   message      The message to send
  * @param  {Object}   subscription The subscription details for the client we
  *                                 are sending to
- * @param  {String}   authToken    Optional token to be used in the
- *                                 `Authentication` header if the endpoint
- *                                 requires it.
+ * @param {Number}    paddingLength The number of bytes of padding to add to the
+ *                                  message before encrypting it.
  * @return {Promise} A promise that resolves if the push was sent successfully
  *                   with status and body.
  */
-function sendWebPush(message, subscription, authToken) {
+function sendWebPush(message, subscription, paddingLength) {
   if (!subscription || !subscription.endpoint) {
     throw new Error('sendWebPush() expects a subscription endpoint with ' +
       'an endpoint parameter.');
@@ -58,23 +67,31 @@ function sendWebPush(message, subscription, authToken) {
   // GCM servers support the Web Push protocol. This should go away in the
   // future.
   const endpoint = subscription.endpoint.replace(GCM_URL, TEMP_GCM_URL);
-
-  const payload = encrypt(message, subscription);
   const headers = {
-    'Content-Encoding': 'aesgcm',
-    'Encryption': `salt=${ub64(payload.salt)}`,
-    'Crypto-Key': `dh=${ub64(payload.serverPublicKey)}`
+    // TODO: Make TTL variable
+    TTL: '0'
   };
+  let body;
 
-  if (authToken) {
-    headers.Authorization = `key=${authToken}`;
-  } else if (endpoint.indexOf(TEMP_GCM_URL) !== -1) {
-    throw new Error('GCM requires an Auth Token parameter');
+  if (message && message.length > 0) {
+    const payload = encrypt(message, subscription, paddingLength);
+    headers['Content-Encoding'] = 'aesgcm';
+    headers.Encryption = `salt=${ub64(payload.salt)}`;
+    headers['Crypto-Key'] = `dh=${ub64(payload.serverPublicKey)}`;
+    body = payload.ciphertext;
+  }
+
+  if (endpoint.indexOf(TEMP_GCM_URL) !== -1) {
+    if (gcmAuthToken) {
+      headers.Authorization = `key=${gcmAuthToken}`;
+    } else {
+      throw new Error('GCM requires an Auth Token parameter');
+    }
   }
 
   return new Promise(function(resolve, reject) {
     request.post(endpoint, {
-      body: payload.ciphertext,
+      body: body,
       headers: headers
     }, function(error, response, body) {
       if (error) {
@@ -101,4 +118,4 @@ function sendWebPush(message, subscription, authToken) {
   });
 }
 
-module.exports = sendWebPush;
+module.exports = {sendWebPush, setGCMAPIKey};
