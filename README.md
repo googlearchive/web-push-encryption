@@ -36,13 +36,9 @@ Send a message:
 `webpush.sendWebPush('Yay! Web Push!', subscription);`
 
 If the push service requires an authentication header (notably Google Cloud
-Messaging, used by Chrome) then you can add that as a third parameter:
+Messaging, used by Chrome) then you can configure it by calling the setGCMAPIKey method
 
-```
-if (subscription.endpoint.indexOf('https://android.googleapis.com/gcm/send/') === 0) {
-  webpush.sendWebPush('A message for Chrome', subscription, MY_GCM_KEY);
-}
-```
+`webpush.setGCMAPIKey(MY_GCM_KEY);`
 
 Docs
 -----
