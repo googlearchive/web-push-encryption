@@ -35,8 +35,9 @@ Send a message:
 
 `webpush.sendWebPush('Yay! Web Push!', subscription);`
 
-If the push service requires an authentication header (notably Google Cloud
-Messaging, used by Chrome) then you can configure it by calling the setGCMAPIKey method
+Google Cloud Messaging (GCM), used as the push service by Chrome, requires
+authentication. You can use the `setGCMAPIKey` method to let the library know
+your API key and it will automatically send it with any GCM push requests.
 
 `webpush.setGCMAPIKey(MY_GCM_KEY);`
 
