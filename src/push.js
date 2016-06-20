@@ -27,8 +27,12 @@ let gcmAuthToken;
 /**
  * Set the key to use in the Authentication header for GCM requests
  * @param {String} key The API key to use
+ * @throws {Error} If the key is invalid
  */
 function setGCMAPIKey(key) {
+  if (!key.startsWith('AIza') || key.length !== 40) {
+    throw new Error('expected Server API Key in the form AIza..., 40 characters long');
+  }
   gcmAuthToken = key;
 }
 
