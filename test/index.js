@@ -263,6 +263,14 @@ describe('Test the Libraries Top Level API', function() {
       ).to.throw('Message must be a String or a Buffer');
     });
 
+    it('should throw an error when a subscription is passed in with a random object as payload data', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => library.sendWebPush({random: 1}, VALID_SUBSCRIPTION)
+      ).to.throw('Message must be a String or a Buffer');
+    });
+
     it('should throw an error when a subscription with no encryption details is passed in with string as payload data', function() {
       const library = require('../src/index.js');
 
