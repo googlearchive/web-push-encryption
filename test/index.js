@@ -315,7 +315,7 @@ describe('Test the Libraries Top Level API', function() {
     });
 
     it('should attempt a web push protocol request for GCM', function() {
-      const API_KEY = 'AAAA';
+      const API_KEY = 'AIza not a real key but must be 40 chars';
       const gcmSubscription = {
         endpoint: GCM_SUBSCRIPTION_EXAMPLE.original,
         keys: VALID_SUBSCRIPTION.keys
@@ -464,6 +464,16 @@ describe('Test the Libraries Top Level API', function() {
         err.code.should.equal('expired-subscription');
         done();
       });
+    });
+
+    it('should throw on invalid API key', function() {
+      const library = require('../src/index.js');
+
+      expect(
+        () => {
+          library.setGCMAPIKey('invalid');
+        }
+      ).to.throw('expected Server API Key in the form AIza..., 40 characters long');
     });
   });
 });
