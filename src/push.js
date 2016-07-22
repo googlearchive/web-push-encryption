@@ -49,7 +49,7 @@ function ub64(buffer) {
  * Sends a message using the Web Push protocol
  *
  * @memberof web-push-encryption
- * @param  {String}   message      The message to send
+ * @param  {String|Buffer} message      The message to send
  * @param  {Object}   subscription The subscription details for the client we
  *                                 are sending to
  * @param {Number}    paddingLength The number of bytes of padding to add to the
@@ -73,12 +73,17 @@ function sendWebPush(message, subscription, paddingLength) {
   };
   let body;
 
-  if (message && message.length > 0) {
-    const payload = encrypt(message, subscription, paddingLength);
-    headers['Content-Encoding'] = 'aesgcm';
-    headers.Encryption = `salt=${ub64(payload.salt)}`;
-    headers['Crypto-Key'] = `dh=${ub64(payload.serverPublicKey)}`;
-    body = payload.ciphertext;
+  if (message) {
+    if (typeof message != 'string' && !(message instanceof Buffer)) {
+      throw new Error('Message must be a String or a Buffer');
+    }
+    if (message.length > 0) {
+      const payload = encrypt(message, subscription, paddingLength);
+      headers['Content-Encoding'] = 'aesgcm';
+      headers.Encryption = `salt=${ub64(payload.salt)}`;
+      headers['Crypto-Key'] = `dh=${ub64(payload.serverPublicKey)}`;
+      body = payload.ciphertext;
+    }
   }
 
   if (endpoint.indexOf(TEMP_GCM_URL) !== -1) {
