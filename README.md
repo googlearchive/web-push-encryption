@@ -1,59 +1,36 @@
-Push Encryption (node)
-----------------------
+# DEPRECATION NOTICE
 
-[![Travis Build Status](https://travis-ci.org/GoogleChrome/web-push-encryption.svg?branch=master)](https://travis-ci.org/GoogleChrome/web-push-encryption) [![Dependency Badge from David](https://david-dm.org/GoogleChrome/web-push-encryption.svg)](https://david-dm.org/GoogleChrome/web-push-encryption) [![devDependency Status](https://david-dm.org/GoogleChrome/web-push-encryption/dev-status.svg)](https://david-dm.org/GoogleChrome/web-push-encryption#info=devDependencies)
+This library is now <strong>deprecated</strong> in favor of:
+[web-push](https://github.com/web-push-libs/web-push)
 
-This library provides the functions necessary to encrypt a payload for sending
-with the Web Push protocol. It also includes a helper function for actually
-send the message to the Web Push endpoint.
+### Migration from `web-push-encryption` to `web-push`
 
-What is this for?
------------------
+To move from this library to `web-push` perform the following steps:
 
-The [Push API](http://w3c.github.io/push-api/) allow users to subscribe for
-notifications from a web site, which can be delivered to them even if the
-browser has been closed. This was first shipped as part of Chrome 42, but the
-push message could not contain any payload data.
+Install the new module and delete `web-push-encryption` from your dependencies.
 
-As of Chrome 50 and Firefox 44 (desktop-only) payloads are supported, but the
-server must encrypt the payload or the receiving browser will reject it.
+    npm install --save web-push
 
-This library implements the necessary encryption as a Node module.
+Swap the required module from `web-push-encryption` to `web-push` in your code.
 
-Overview
---------
+    var webpush = require('web-push');
 
-Install the module using npm:
+Replace the `sendWebPush(<Payload String or Buffer>, <PushSubscription Object>)` call with
+the following:
 
-`npm install web-push-encryption`
+    const params = {
+      payload: <Payload String or Buffer>
+    };
+    if (subscription.keys) {
+      params.userPublicKey = subscription.keys.p256dh;
+      params.userAuth = subscription.keys.auth;
+    }
+    webpush.sendNotification(subscription.endpoint, params);
 
-Require the module:
+`setGCMAPIKey` is the same for both libraries, just make sure it's called
+ before `sendNotificaiton`.
 
-`var webpush = require('web-push-encryption');`
-
-Send a message:
-
-`webpush.sendWebPush('Yay! Web Push!', subscription);`
-
-Google Cloud Messaging (GCM), used as the push service by Chrome, requires
-authentication. You can use the `setGCMAPIKey` method to let the library know
-your API key and it will automatically send it with any GCM push requests.
-
-`webpush.setGCMAPIKey(MY_GCM_KEY);`
-
-Docs
------
-
-You can [find docs here](https://googlechrome.github.io/web-push-encryption/).
-
-Support
--------
-
-If you've found an error in this library, please file an issue:
-https://github.com/GoogleChrome/web-push-encryption/issues
-
-Patches are encouraged, and may be submitted by forking this project and
-submitting a pull request through GitHub.
+    webpush.setGCMAPIKey(MY_GCM_KEY);
 
 License
 -------
